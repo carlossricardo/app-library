@@ -26,8 +26,10 @@ class CartService {
 
             $loan = Loan::create([
                 'user_id' => $userId, 
-                'total_units' => $newRequest['total_units'],
-                'date_returned' => Carbon::parse($newRequest['date_returned'])->toDateString(),                
+                'total_units' => $newRequest['total_units'],                       
+                // 'date_returned' => $newRequest['date_returned'],                       
+                // 'date_returned' => Carbon::parse($newRequest['date_returned']),     
+                'date_returned' => Carbon::parse($newRequest['date_returned'])->timezone(config('app.timezone')),           
                 'status' => Loan::STATUS_ACTIVE, 
             ]);
 
@@ -62,7 +64,8 @@ class CartService {
             return response()->json([
                 'status' => true,
                 'message' => 'Prestamo realizado con éxito.',  
-                'data' => $loan         
+                'data' => $newRequest['date_returned']         
+                // 'data' => $loan         
             ], 200);
             
             
@@ -98,6 +101,7 @@ class CartService {
                                         'title' => $cart->book->title,
                                         'description' => $cart->book->description,
                                         'image' => $cart->book->image,
+                                        'autor' => $cart->book->autor,
                                         'units' => $cart->book->units,
                                         'emission' => $cart->book->emission,
                                     ],
@@ -131,8 +135,16 @@ class CartService {
         try {         
 
             $user_id = Auth::id();
-    
-            Cart::find('user_id', $user_id);
+                        
+            $deletedRows = Cart::where('user_id', $user_id)->delete();
+
+            if ($deletedRows === 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No hay registros para eliminar.',
+                    'data' => null
+                ], 200);
+            }
             
             return response()->json([
                 'status' => true,

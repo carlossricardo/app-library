@@ -6,6 +6,7 @@ use Illuminate\DataBase\QueryException;
 use App\Models\Loan;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\InternalServerErrorException;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\DB;
 
@@ -13,9 +14,13 @@ class LoanService {
 
 
     public function patch( Request $request ){
+
+
         $loan_id = $request->get('loan_id');
         $newRequest = collect($request)->all();  
         try {
+
+            $userId = Auth::id();
 
             $loan = Loan::find($loan_id);
 
@@ -23,9 +28,19 @@ class LoanService {
                 throw new NotFoundException('El prestamo con id ' . ${loan->id} . ' no existe.');
             }
 
-            $loan->update([
-                'status' => $newRequest['status'],
-            ]);
+            
+            
+            $loan->reviewed_by = $userId;
+            $loan->status = $newRequest['status'];
+            
+
+
+            
+            $loan->save();
+
+
+
+            
 
             return response()->json([
                 'status' => true,
@@ -52,8 +67,9 @@ class LoanService {
 
         try {  
             
-            
-            $loans = Loan::with(['details.book', 'user']) 
+            $total_records = Loan::all()->count();
+
+            $loans = Loan::with(['details.book', 'user', 'reviewer']) 
             ->orderBy('updated_at', 'desc')
             ->offset($offset * $limit)
             ->limit($limit)
@@ -62,14 +78,83 @@ class LoanService {
                 return [
                     'id' => $loan->id,
                     'status' => $loan->status,
+                    'total_units' => $loan->total_units,
+                    'date_returned' => $loan->date_returned,
                     'created_at' => $loan->created_at,
                     'updated_at' => $loan->updated_at,
                     'user' => [
-                        'id' => $loan->user->id,
-                        'name' => $loan->user->name,
+                        'id' => $loan->user->id,                        
                         'email' => $loan->user->email,
                         'person' => $loan->user->person
                     ],
+                    'reviewer' => $loan->reviewer ? [ 
+                        'id' => $loan->reviewer->id,                        
+                        'email' => $loan->reviewer->email,
+                        'person' => $loan->reviewer->person
+                    ] : null, 
+                    'details' => $loan->details->map(function ($detail) {
+                        return [
+                            'id' => $detail->id,
+                            'quantity' => $detail->quantity,
+                            'book' => $detail->book, 
+                        ];
+                    }),
+                ];
+            });
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data successful',
+                'data' => $loans,
+                'total_records' => $total_records,
+            ], 200);
+
+        } catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }  catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        } catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+                
+    }
+
+    public function findAllClient(  int $offset = 0, int $limit = 10 ){
+
+        try {
+
+            $userId = Auth::id();
+
+            $loans = Loan::with(['details.book', 'user', 'reviewer']) 
+            ->orderBy('updated_at', 'desc')
+            ->where('user_id', $userId)
+            ->offset($offset * $limit)
+            ->limit($limit)
+            ->get()
+            ->map(function ($loan) {
+                return [
+                    'id' => $loan->id,
+                    'status' => $loan->status,
+                    'total_units' => $loan->total_units,
+                    'date_returned' => $loan->date_returned,
+                    'created_at' => $loan->created_at,
+                    'updated_at' => $loan->updated_at,
+                    'user' => [
+                        'id' => $loan->user->id,                        
+                        'email' => $loan->user->email,
+                        'person' => $loan->user->person
+                    ],
+                    'reviewer' => $loan->reviewer ? [ 
+                        'id' => $loan->reviewer->id ?? null,  
+                        'email' => $loan->reviewer->email ?? null, 
+                        'person' => $loan->reviewer->person ?? null,
+                    ] : null, 
                     'details' => $loan->details->map(function ($detail) {
                         return [
                             'id' => $detail->id,
@@ -87,19 +172,19 @@ class LoanService {
                 'data' => $loans
             ], 200);
 
-        } catch (QueryException $e) {                         
+        }   catch (QueryException $e) {                         
             if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
                 throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
             }            
             throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
     
-        }  catch (\PDOException $th) {            
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
-                
+
     }
 
 

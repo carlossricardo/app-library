@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('books_categories', function (Blueprint $table) {
-            $table->uuid('book_id'); // UUID de la relación con 'books'
-            $table->uuid('category_id'); // UUID de la relación con 'categories'
+            $table->uuid('book_id'); 
+            $table->uuid('category_id'); 
 
-            // Clave primaria compuesta
+            
             $table->primary(['book_id', 'category_id']);
 
-            // Claves foráneas
+            
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
 

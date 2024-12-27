@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans', function (Blueprint $table) {
-            // $table->id();
+        Schema::create('loans', function (Blueprint $table) {            
             
             
             $table->uuid('id')->primary();
 
             $table->uuid('user_id'); 
+            $table->uuid('reviewed_by')->nullable(); 
 
-            // Definimos la clave foránea
+            
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->date('date_returned');
+            $table->foreign('reviewed_by')->references('id')->on('users')->onDelete('set null');            
+            $table->timestamp('date_returned')->nullable();            
             $table->bigInteger('total_units');
             $table->enum('status', ['active', 'accepted', 'returned', 'overdue', 'rejected'])->default('active');
             

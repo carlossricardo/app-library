@@ -38,6 +38,11 @@ class SecurityController extends Controller
         return $this->securityService->findAllPermissions( $request );
     }
 
+
+    public function findUserActive( Request $request ){                     
+        return $this->securityService->findUserActive( $request );
+    }
+
    
 
 }

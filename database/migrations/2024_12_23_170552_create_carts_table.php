@@ -16,20 +16,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
 
 
-            $table->uuid('user_id'); // UUID de la relación con 'categories'
-            $table->uuid('book_id'); // UUID de la relación con 'books'
+            $table->uuid('user_id'); 
+            $table->uuid('book_id'); 
 
-            // Clave primaria compuesta
-            // $table->primary(['book_id', 'category_id']);
-
-            // Claves foráneas
+     
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
 
-
-            // $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // FK a usuarios
-            // $table->foreignId('book_id')->constrained('books')->onDelete('cascade'); // FK a libros
-            $table->integer('quantity')->default(1); // Cantidad del libro
+            $table->integer('quantity')->default(1); 
             $table->timestamps();
         });
     }

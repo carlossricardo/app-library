@@ -90,7 +90,7 @@ class OptionSeeder extends Seeder
             ],
             [
                 'id' => (string) \Str::uuid(),
-                'name' => 'Categorías disponibles',
+                'name' => 'Categorías',
                 'url' => '/categories/client',
                 'icon' => 'pi pi-objects-column',
                 'parent_id' => $menus[1]['id'],
@@ -99,8 +99,8 @@ class OptionSeeder extends Seeder
             ],
             [
                 'id' => (string) \Str::uuid(),
-                'name' => 'Mi carrito',
-                'url' => '/loans/cart',
+                'name' => 'Gestión de prestamos',
+                'url' => '/loans/client',
                 'icon' => 'pi pi-shopping-cart',
                 'parent_id' => $menus[1]['id'],
                 'status' => true,

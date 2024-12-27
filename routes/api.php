@@ -67,12 +67,12 @@ Route::prefix('administration')->middleware('jwt-middleware')->group(function ()
     Route::get('/loan', [LoanController::class, 'findAll'])
         ->middleware('profile-middleware:ADMIN');
     Route::patch('/loan', [LoanController::class, 'patch'])
-        ->middleware('profile-middleware:ADMIN');
-
-
+    ->middleware('profile-middleware:ADMIN');
     
-    // Route::post('/client/loans', [LoanCliController::class, 'createCartBook'])
-    // ->middleware('profile-middleware:STUDENT,ADMIN');  
+    Route::get('/client/loan', [LoanCliController::class, 'findAllClient'])
+        ->middleware('profile-middleware:STUDENT');  
+
+
 });
 
 
@@ -83,6 +83,9 @@ Route::prefix('security')->middleware('jwt-middleware')->group(function () {
 
     Route::post('/profile', [SecurityController::class, 'createProfile'])
         ->middleware('profile-middleware:ADMIN');
+
+    Route::get('/user', [SecurityController::class, 'findUserActive'])
+        ->middleware('profile-middleware:STUDENT,ADMIN');
 
 
     Route::post('/privilege', [SecurityController::class, 'createPrivilege'])

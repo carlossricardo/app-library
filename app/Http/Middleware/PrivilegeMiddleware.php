@@ -17,19 +17,18 @@ class PrivilegeMiddleware
     public function handle(Request $request, Closure $next, string $privileges): Response
     {
         try {
-            // Autenticar al usuario
+            
             $user = JWTAuth::parseToken()->authenticate();
-
-            // Obtener los privilegios desde los perfiles asociados al usuario
+            
             $userPrivileges = $user->profiles()
-                ->with('privileges') // Cargar privilegios asociados
+                ->with('privileges') 
                 ->get()
-                ->pluck('privileges') // Obtener los privilegios de todos los perfiles
-                ->flatten() // Aplanar la colección anidada
-                ->pluck('name') // Extraer los nombres de los privilegios
+                ->pluck('privileges') 
+                ->flatten() 
+                ->pluck('name') 
                 ->toArray();
 
-            // Validar si el usuario tiene al menos uno de los privilegios necesarios
+            
             $hasRequiredPrivilege = array_intersect($privileges, $userPrivileges);
 
             if (empty($hasRequiredPrivilege)) {

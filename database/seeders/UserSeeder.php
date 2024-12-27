@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
                     'identification' => '2450661760',
                     'names' => 'Carlos',
                     'surnames' => 'Ricardo',
+                    'image' => 'a9584a1f-840b-4cb8-966b-79f4692aae37_20241226_124831.jpg',
                     'phone' => '0986757532',
                     'status' => true,
                 ]
@@ -38,6 +39,7 @@ class UserSeeder extends Seeder
                     'identification' => '0987654321',
                     'names' => 'José',
                     'surnames' => 'Madero',
+                    'image' => 'a9584a1f-840b-4cb8-966b-79f4692aae37_20241226_124831.jpg',
                     'phone' => '555654321',
                     'status' => true,
                 ]
@@ -53,6 +55,7 @@ class UserSeeder extends Seeder
                 'identification' => $userData['person']['identification'],
                 'names' => $userData['person']['names'],
                 'surnames' => $userData['person']['surnames'],
+                'image' => $userData['person']['image'],
                 'phone' => $userData['person']['phone'],
                 'status' => $userData['person']['status'],
             ]);

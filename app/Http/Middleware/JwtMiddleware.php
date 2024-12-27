@@ -22,7 +22,7 @@ class JwtMiddleware
         try {
             JWTAuth::parseToken()->authenticate();
             
-            // $user = JWTAuth::parseToken()->authenticate();
+            
         } catch (JWTException $e) {
             // return response()->json(['error' => $e], 401);
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {

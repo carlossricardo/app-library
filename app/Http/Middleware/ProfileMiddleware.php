@@ -20,13 +20,13 @@ class ProfileMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            // Dividir los roles en un arreglo
+            
             $allowedRoles = explode(',', $roles);
 
-            // Obtener los perfiles del usuario
+            
             $profiles = $user->profiles->pluck('name')->toArray();
 
-            // Verificar si al menos uno de los roles coincide
+            
             if (!array_intersect($allowedRoles, $profiles)) {
                 return response()->json(['error' => 'Unauthorized. Roles required: ' . $roles], 403);
             }
@@ -36,18 +36,5 @@ class ProfileMiddleware
 
         return $next($request);
 
-        // try {
-            
-        //     $user = JWTAuth::parseToken()->authenticate();
-
-        //     $profiles = $user->profiles->pluck('name')->toArray();
-        //     if (!in_array($role, $profiles)) {
-        //         return response()->json(['error' => 'Unauthorized. Role required: ' . $role], 403);
-        //     }
-        // }  catch (\Exception $e) {
-        //     return response()->json(['error' => $e->getMessage()], 401);
-        // }
-
-        // return $next($request);
     }
 }

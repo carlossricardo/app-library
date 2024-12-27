@@ -140,16 +140,20 @@ class BookService {
                 'image' => $request['image'],
                 'autor' => $request['autor'],
                 'status' => $request['status'],
-                'emission' => $request['emission'],
+                'emission' => Carbon::parse($request['emission'])->toDateString(),
                 'units' => $request['units'],
             ]);
             
             $newBook->categories()->attach($categories->pluck('id')->toArray());
 
+
+            $response = $newBook->toArray();
+            $response['categories'] = $newBook->categories()->pluck('id')->toArray();
+            
             return response()->json([
                 'status' => true,
                 'message' => 'Libro creado y categorías asociadas con éxito.',
-                'data' => $newBook,
+                'data' => $response,
             ], 201);
 
         }  catch (QueryException $e) {                              
@@ -169,6 +173,8 @@ class BookService {
 
 
         try {
+
+            $total_records = Book::where('status', 1)->count(); 
             $books = Book::orderBy('updated_at', 'desc')
             ->offset($offset * $limit)           
             ->limit($limit)                      
@@ -193,7 +199,8 @@ class BookService {
             return response()->json([
                 'status' => true,
                 'message' => 'Data successful',
-                'data' => $books
+                'data' => $books,
+                'total_records' => $total_records,
             ], 200);
 
         } catch (QueryException $e) {                              
@@ -212,6 +219,7 @@ class BookService {
 
 
         try {
+            $total_records = Book::where('status', 1)->count(); 
             $books = Book::where('status', 1)
                 ->orderBy('created_at', 'desc')
                 ->offset($offset * $limit)           
@@ -234,7 +242,8 @@ class BookService {
             return response()->json([
                 'status' => true,
                 'message' => 'Data successful',
-                'data' => $books
+                'data' => $books,
+                'total_records' => $total_records,
             ], 200);
 
         } catch (QueryException $e) {                              

@@ -14,7 +14,40 @@ use Illuminate\Support\Facades\DB;
 class SecurityService {
 
 
+    public function findUserActive ( Request $request ) {
 
+        try {
+
+            $user_id = Auth::id();
+
+            $user = User::with('person')->find($user_id);
+
+            $data = $user->toArray();
+            unset($data['person_id']);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data successfully',
+                'data' => $data
+            ], 200);
+
+
+
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+
+
+    }
 
     public function findAllPermissions( Request $request ){
 

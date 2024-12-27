@@ -14,7 +14,9 @@ class Loan extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['user_id', 'date_returned', 'total_units', 'status'];
+    protected $fillable = ['user_id', 'date_returned', 'reviewed_by', 'total_units', 'status'];
+
+    public $timestamps = true;
 
     protected static function boot()
     {
@@ -25,7 +27,10 @@ class Loan extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
+
     }
+
+
 
     
     const STATUS_ACTIVE = 'active';
@@ -42,6 +47,11 @@ class Loan extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewer()
+    {        
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
 

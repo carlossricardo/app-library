@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('loan_details', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // UUID como clave primaria
-            $table->uuid('loan_id'); // Referencia al préstamo
-            $table->uuid('book_id'); // Referencia al libro
-            $table->integer('quantity')->default(1); // Cantidad de libros prestados
-
-            // Claves foráneas
+            $table->uuid('id')->primary(); 
+            $table->uuid('loan_id'); 
+            $table->uuid('book_id'); 
+            $table->integer('quantity')->default(1); 
+            
             $table->foreign('loan_id')->references('id')->on('loans')->onDelete('cascade');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->timestamps();

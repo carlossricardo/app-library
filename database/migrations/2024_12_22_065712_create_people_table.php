@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('identification', 10);
             $table->string('names', 60);
             $table->string('surnames', 60);
+            $table->string('image', 180);
             $table->string('phone', 10);
             $table->boolean('status');
             $table->timestamps();

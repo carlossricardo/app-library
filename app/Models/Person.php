@@ -16,7 +16,7 @@ class Person extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = [ 'identification', 'names', 'surnames', 'phone', 'status' ];
+    protected $fillable = [ 'identification', 'names', 'surnames', 'image', 'phone', 'status' ];
 
     protected static function boot()
     {
