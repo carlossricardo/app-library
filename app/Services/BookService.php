@@ -33,13 +33,16 @@ class BookService {
             ], 201);
 
 
-        } catch (QueryException $e) {                                      
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
             throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
     
-        }  catch (\PDOException $th) {            
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
 
@@ -55,66 +58,69 @@ class BookService {
     public function patch( $book_id, $request )
     {        
 
-        $book = Book::find($book_id);
-
-        if (!$book) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Este libro no existe.',
-                'missing_categories' => null
-            ], 404);
-        }
-
         
-        $categories = Category::whereIn('id', $request['categories'])->get();
-        $missingCategories = array_diff($request['categories'], $categories->pluck('id')->toArray());
-
-        if (!empty($missingCategories)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Algunas categorías no existen.',
-                'missing_categories' => $missingCategories,
-            ], 404);
-        }
-
-
-        $book->update([
-            'title' => $request['title'] ?? $book->title, 
-            'description' => $request['description'] ?? $book->description,
-            'image' => $request['image'] ?? $book->image,
-            'autor' => $request['autor'] ?? $book->autor,
-            'status' => $request['status'] ?? $book->status,            
-            'emission' => isset($request['emission']) ? Carbon::parse($request['emission'])->toDateString() : $book->emission,
-            'units' => $request['units'] ?? $book->units,
-        ]);
-
         
-        $book->categories()->sync($categories->pluck('id')->toArray());
-
         
-        $response = $book->toArray();
-        $response['categories'] = $book->categories()->pluck('id')->toArray();
-
-
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Libro actualizado con éxito.',
-            'data' => $response,
-        ], 200);
-
-
-
-
+        
         try {
-            //code...
-        }  catch (QueryException $e) {                              
-            throw new InternalServerErrorException('Error en los query de la base de datos: ' . $e->getMessage());
+            $book = Book::find($book_id);
     
-        }  catch (\PDOException $th) {            
+            if (!$book) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Este libro no existe.',
+                    'missing_categories' => null
+                ], 404);
+            }
+    
+            
+            $categories = Category::whereIn('id', $request['categories'])->get();
+            $missingCategories = array_diff($request['categories'], $categories->pluck('id')->toArray());
+    
+            if (!empty($missingCategories)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Algunas categorías no existen.',
+                    'missing_categories' => $missingCategories,
+                ], 404);
+            }
+    
+    
+            $book->update([
+                'title' => $request['title'] ?? $book->title, 
+                'description' => $request['description'] ?? $book->description,
+                'image' => $request['image'] ?? $book->image,
+                'autor' => $request['autor'] ?? $book->autor,
+                'status' => $request['status'] ?? $book->status,            
+                'emission' => isset($request['emission']) ? Carbon::parse($request['emission'])->toDateString() : $book->emission,
+                'units' => $request['units'] ?? $book->units,
+            ]);
+    
+            
+            $book->categories()->sync($categories->pluck('id')->toArray());
+    
+            
+            $response = $book->toArray();
+            $response['categories'] = $book->categories()->pluck('id')->toArray();
+    
+    
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'Libro actualizado con éxito.',
+                'data' => $response,
+            ], 200);
+            
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
     }
@@ -156,13 +162,16 @@ class BookService {
                 'data' => $response,
             ], 201);
 
-        }  catch (QueryException $e) {                              
-            throw new InternalServerErrorException('Error en los query de la base de datos: ' . $e->getMessage());
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
     
-        }  catch (\PDOException $th) {            
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
     }
@@ -203,13 +212,16 @@ class BookService {
                 'total_records' => $total_records,
             ], 200);
 
-        } catch (QueryException $e) {                              
-            throw new InternalServerErrorException('Error en los query de la base de datos: ' . $e->getMessage());
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
     
-        }  catch (\PDOException $th) {            
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
     }
@@ -246,13 +258,16 @@ class BookService {
                 'total_records' => $total_records,
             ], 200);
 
-        } catch (QueryException $e) {                              
-            throw new InternalServerErrorException('Error en los query de la base de datos: ' . $e->getMessage());
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
     
-        }  catch (\PDOException $th) {            
+        }   catch (\PDOException $th) {            
             throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
             
-        } catch (Exception $e) {            
+        }   catch (Exception $e) {            
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
     }

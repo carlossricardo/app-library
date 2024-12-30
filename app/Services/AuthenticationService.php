@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\DataBase\QueryException;
 use App\Models\Category;
 use App\Models\Profile;
-use App\Models\User;
+use App\Models\{User,Person};
 use App\Exceptions\BookException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\InternalServerErrorException;
@@ -19,29 +19,95 @@ class AuthenticationService {
 
 
     public function login( $email, $password ) {
-
-        // $data_user = collect($request)->all();
-
-        $user = User::where( 'email', $email )->first();
-
-        if( !$user ){
-           throw new NotFoundException("Usuario no encontrado");
-        }
         
-        $isPasswordCorrect = Hash::check( $password, $user->password );
-        if( !$isPasswordCorrect ){
-            throw new NotFoundException("La contraseña es incorrecta");
+        
+        try {
+            $user = User::where( 'email', $email )->first();
+    
+            if( !$user ){
+               throw new NotFoundException("Usuario no encontrado");
+            }
+            
+            $isPasswordCorrect = Hash::check( $password, $user->password );
+            if( !$isPasswordCorrect ){
+                throw new NotFoundException("La contraseña es incorrecta");
+            }
+    
+    
+            $payload = [ 'user_id' => $user->id ];
+            $token = JWTAuth::claims($payload)->fromSubject($user);
+            // return response()->json($token, 200);
+            return response()->json([
+                'status' => true,
+                'message' => 'Acceso al sistema.',
+                'token' => $token
+            ], 200);
+            
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
 
+    }
 
-        $payload = [ 'user_id' => $user->id ];
-        $token = JWTAuth::claims($payload)->fromSubject($user);
-        // return response()->json($token, 200);
-        return response()->json([
-            'status' => true,
-            'message' => 'Acceso al sistema.',
-            'token' => $token
-        ], 200);
+
+    public function registerClient ( Request $request ){
+
+        $userData = collect($request)->all();
+        try {
+            
+
+            $person = Person::create([                
+                'identification' => $userData['identification'],
+                'names' => $userData['names'],
+                'surnames' => $userData['surnames'],
+                'image' => $userData['image'],
+                'phone' => $userData['phone'],
+                'status' => true,
+            ]);
+
+            $user = User::create([                
+                'person_id' => $person->id, 
+                'email' => $userData['email'],
+                'password' => Hash::make($userData['password']),
+            ]);
+
+            $profileIds = Profile::whereIn('name', $userData['profiles'])->pluck('id');
+            $user->profiles()->attach($profileIds);
+
+            $payload = [ 'user_id' => $user->id ];
+            $token = JWTAuth::claims($payload)->fromSubject($user);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Registro realizado con éxito.',
+                'token' => $token
+            ], 200);
+
+
+
+
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+
     }
 
     public function register( Request $request ) {
@@ -89,7 +155,6 @@ class AuthenticationService {
             throw new InternalServerErrorException('Ocurrió un error inesperado. ' . $e->getMessage());
             
         }
-
 
 
     }

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AuthenticationController;
+use App\Http\Controllers\Client\AuthenticationCliController;
 use App\Http\Controllers\Admin\{SecurityController, LoanController};
 use App\Http\Controllers\Client\CategoryCliController;
 use App\Http\Controllers\Client\BookCliController;
@@ -17,7 +18,9 @@ use App\Http\Middleware\JwtMiddleware;
 Route::prefix('authentication')->group(function () {
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/register', [AuthenticationController::class, 'register']);
-
+    
+    //Client
+    Route::post('/client/register', [AuthenticationCliController::class, 'registerClient']);
 });
 
 

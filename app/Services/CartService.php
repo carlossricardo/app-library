@@ -52,9 +52,9 @@ class CartService {
                 ]);
     
                 
-                $book->update([
-                    'units' => $book->units - $cart->quantity,
-                ]);
+                // $book->update([
+                //     'units' => $book->units - $cart->quantity,
+                // ]);
             }
 
             

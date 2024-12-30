@@ -3,10 +3,13 @@
 namespace App\Services;
 use Illuminate\Http\Request;
 use Illuminate\DataBase\QueryException;
-use App\Models\Loan;
+use App\Models\{Loan,Book};
 use App\Exceptions\NotFoundException;
+// use App\Exceptions\Exception;
 use App\Exceptions\InternalServerErrorException;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\UpdateLoanStatusJob;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\DB;
 
@@ -23,29 +26,54 @@ class LoanService {
             $userId = Auth::id();
 
             $loan = Loan::find($loan_id);
+            
+            $previousStatus = $loan->status; 
+            $newStatus = $newRequest['status']; 
+
 
             if (!$loan) {
                 throw new NotFoundException('El prestamo con id ' . ${loan->id} . ' no existe.');
             }
 
-            
+            if ($newStatus === Loan::STATUS_ACCEPTED && $previousStatus !== Loan::STATUS_ACCEPTED) {
+                
+                foreach ($loan->details as $detail) {
+                    $book = Book::find($detail->book_id);
+                    if ($book) {
+                        if ($book->units < $detail->quantity) {
+                            throw new Exception('No hay suficientes unidades de "' . $book->title . '" disponibles.');
+                        }
+
+                    
+                        $book->units -= $detail->quantity;
+                        $book->save();
+                    }
+                }
+                
+                // $jobDelay = max(0, Carbon::parse($loan->date_returned)->diffInSeconds(now())); //New function                                
+                // UpdateLoanStatusJob::dispatch($loan->id)->delay($jobDelay);
+                
+                
+            } elseif ($newStatus === Loan::STATUS_RETURNED && $previousStatus === Loan::STATUS_ACCEPTED) {                
+                foreach ($loan->details as $detail) {
+                    $book = Book::find($detail->book_id);
+                    if ($book) {
+                        $book->units += $detail->quantity;
+                        $book->save();
+                    }
+                }
+            }
+    
             
             $loan->reviewed_by = $userId;
-            $loan->status = $newRequest['status'];
-            
+            $loan->status = $newStatus;
 
-
-            
-            $loan->save();
-
-
-
-            
+            $loan->save();            
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cambios realizo con éxito.',
-                'data' => $loan
+                'data' => $loan,                
             ], 200);
 
 

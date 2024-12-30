@@ -30,7 +30,7 @@ class ToolService {
             $folder = $request->input('folder');
     
             
-            $validExtension = ['png', 'jpg', 'jpeg'];
+            $validExtension = ['png', 'jpg', 'jpeg', 'JPG'];
             $extension = $file->getClientOriginalExtension();
     
             if (in_array($extension, $validExtension)) {
@@ -67,31 +67,31 @@ class ToolService {
     public function getFile($folder, $file){
 
          
-    if (Storage::disk($folder)->exists($file)) {
-        
-        $fileContent = Storage::disk($folder)->get($file);
+        if (Storage::disk($folder)->exists($file)) {
+            
+            $fileContent = Storage::disk($folder)->get($file);
+
+            
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            $mimeType = match($extension) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                default => 'application/octet-stream',
+            };
+
+            
+            return new Response($fileContent, 200, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $file . '"',
+            ]);
+        }
 
         
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-        $mimeType = match($extension) {
-            'jpg', 'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'gif' => 'image/gif',
-            default => 'application/octet-stream',
-        };
-
-        
-        return new Response($fileContent, 200, [
-            'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $file . '"',
-        ]);
-    }
-
-    
-    return response()->json([
-        'status' => false,
-        'message' => 'No existe la imagen',
-    ], 404);
+        return response()->json([
+            'status' => false,
+            'message' => 'No existe la imagen',
+        ], 404);
 
     }
 
