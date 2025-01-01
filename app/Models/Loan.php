@@ -14,7 +14,7 @@ class Loan extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['user_id', 'date_returned', 'reviewed_by', 'total_units', 'status'];
+    protected $fillable = ['user_id', 'date_returned', 'note', 'reviewed_by', 'total_units', 'status'];
 
     public $timestamps = true;
 

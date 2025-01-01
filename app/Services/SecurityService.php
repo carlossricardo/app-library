@@ -25,6 +25,12 @@ class SecurityService {
             $data = $user->toArray();
             unset($data['person_id']);
 
+            $isAdmin = $user->profiles->contains(function ($profile) {
+                return $profile->name === 'ADMIN'; 
+            });
+             
+            $data['isAdmin'] = $isAdmin;
+
             return response()->json([
                 'status' => true,
                 'message' => 'Data successfully',

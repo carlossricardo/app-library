@@ -27,6 +27,7 @@ class CartService {
             $loan = Loan::create([
                 'user_id' => $userId, 
                 'total_units' => $newRequest['total_units'],                       
+                'note' => $newRequest['note'],                       
                 // 'date_returned' => $newRequest['date_returned'],                       
                 // 'date_returned' => Carbon::parse($newRequest['date_returned']),     
                 'date_returned' => Carbon::parse($newRequest['date_returned'])->timezone(config('app.timezone')),           
@@ -50,11 +51,7 @@ class CartService {
                     'book_id' => $cart->book_id,
                     'quantity' => $cart->quantity,
                 ]);
-    
-                
-                // $book->update([
-                //     'units' => $book->units - $cart->quantity,
-                // ]);
+
             }
 
             
@@ -104,6 +101,7 @@ class CartService {
                                         'autor' => $cart->book->autor,
                                         'units' => $cart->book->units,
                                         'emission' => $cart->book->emission,
+                                        'categories' => $cart->book->categories->pluck('name')->toArray()
                                     ],
                                   
                                 ];

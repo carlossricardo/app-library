@@ -68,12 +68,42 @@ class LoanService {
             $loan->reviewed_by = $userId;
             $loan->status = $newStatus;
 
-            $loan->save();            
+            $loan->save();  
+            
+              // Obtén el préstamo actualizado con las relaciones
+            $loan = Loan::with(['details.book', 'user', 'reviewer'])->find($loan->id);
+
+            // Formatea el préstamo en el formato que necesitas
+            $formattedLoan = [
+                'id' => $loan->id,
+                'status' => $loan->status,
+                'total_units' => $loan->total_units,
+                'date_returned' => $loan->date_returned,
+                'created_at' => $loan->created_at,
+                'updated_at' => $loan->updated_at,
+                'user' => [
+                    'id' => $loan->user->id,
+                    'email' => $loan->user->email,
+                    'person' => $loan->user->person,
+                ],
+                'reviewer' => $loan->reviewer ? [
+                    'id' => $loan->reviewer->id,
+                    'email' => $loan->reviewer->email,
+                    'person' => $loan->reviewer->person,
+                ] : null,
+                'details' => $loan->details->map(function ($detail) {
+                    return [
+                        'id' => $detail->id,
+                        'quantity' => $detail->quantity,
+                        'book' => $detail->book,
+                    ];
+                })->toArray(), // Convierte los detalles a un array si es necesario
+            ];
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cambios realizo con éxito.',
-                'data' => $loan,                
+                'data' => $formattedLoan,                
             ], 200);
 
 
@@ -108,6 +138,7 @@ class LoanService {
                     'status' => $loan->status,
                     'total_units' => $loan->total_units,
                     'date_returned' => $loan->date_returned,
+                    'note' => $loan->note,
                     'created_at' => $loan->created_at,
                     'updated_at' => $loan->updated_at,
                     'user' => [

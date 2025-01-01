@@ -22,7 +22,8 @@ return new class extends Migration
             
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('reviewed_by')->references('id')->on('users')->onDelete('set null');            
-            $table->timestamp('date_returned')->nullable();            
+            $table->timestamp('date_returned')->nullable();  
+            $table->text('note')->nullable();          
             $table->bigInteger('total_units');
             $table->enum('status', ['active', 'accepted', 'returned', 'overdue', 'rejected'])->default('active');
             

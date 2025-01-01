@@ -17,6 +17,18 @@ class OptionSeeder extends Seeder
         $menus = [
             [
                 'id' => (string) \Str::uuid(),
+                'name' => 'Inicio',
+                'url' => '',
+                'icon' => 'pi pi-home',
+                'parent_id' => null,
+                'status' => true,
+                'profiles' => ['ADMIN', 'STUDENT']
+            ],
+
+
+            
+            [
+                'id' => (string) \Str::uuid(),
                 'name' => 'Administración',
                 'url' => '',
                 'icon' => 'pi pi-database',

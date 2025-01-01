@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AuthenticationController;
 use App\Http\Controllers\Client\AuthenticationCliController;
-use App\Http\Controllers\Admin\{SecurityController, LoanController};
+use App\Http\Controllers\Admin\{SecurityController, LoanController, DashboardController};
 use App\Http\Controllers\Client\CategoryCliController;
 use App\Http\Controllers\Client\BookCliController;
 use App\Http\Controllers\Tools\ToolController;
@@ -21,6 +21,15 @@ Route::prefix('authentication')->group(function () {
     
     //Client
     Route::post('/client/register', [AuthenticationCliController::class, 'registerClient']);
+});
+
+//Dashboard
+Route::prefix('dashboard')->middleware('jwt-middleware')->group(function () {
+
+    Route::get('/active', [DashboardController::class, 'findAll'])
+        ->middleware('profile-middleware:ADMIN');
+
+
 });
 
 
