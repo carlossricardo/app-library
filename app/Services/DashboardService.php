@@ -18,7 +18,7 @@ class DashboardService {
         try {    
             
             
-            
+            //Week
             $startOfWeek = Carbon::now()->startOfWeek(); 
             $endOfWeek = Carbon::now()->endOfWeek();
 
@@ -29,10 +29,26 @@ class DashboardService {
 
              
             $totalBooksLoaned = 0;
-
+            
             foreach ($loans as $loan) {
                 foreach ($loan->details as $detail) {
                     $totalBooksLoaned += $detail->quantity; 
+                }
+            }
+
+            //Month
+            $startOfMonth = Carbon::now()->startOfMonth(); 
+            $endOfMonth = Carbon::now()->endOfMonth();
+
+            $loansMonth = Loan::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                ->with('details') 
+                ->get(); 
+
+            $totalBooksLoanedMonth = 0;
+
+            foreach ($loansMonth as $loan) { 
+                foreach ($loan->details as $detail) { 
+                    $totalBooksLoanedMonth += $detail->quantity; 
                 }
             }
 
@@ -55,6 +71,12 @@ class DashboardService {
                     'icon' => 'pi pi-cart-arrow-down',
                     'value' => $totalBooksLoaned,
                     'color' => 'bg-blue-100'
+                ],
+                [
+                    'name' => 'Prestamos por mes',
+                    'icon' => 'pi pi-calendar',
+                    'value' => $totalBooksLoanedMonth,
+                    'color' => 'bg-yellow-300'
                 ],
                 [
                     'name' => 'Cantidad de estudiantes',
@@ -126,6 +148,23 @@ class DashboardService {
                 }
             }
 
+             //Month
+             $startOfMonth = Carbon::now()->startOfMonth(); 
+             $endOfMonth = Carbon::now()->endOfMonth();
+ 
+             $loansMonth = Loan::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                ->where('user_id', $userId)
+                ->with('details') 
+                ->get(); 
+ 
+             $totalBooksLoanedMonth = 0;
+ 
+             foreach ($loansMonth as $loan) { 
+                 foreach ($loan->details as $detail) { 
+                     $totalBooksLoanedMonth += $detail->quantity; 
+                 }
+             }
+
             $totalAvailableBooks = Book::where('status', true)->count();
 
             $dashboard = [
@@ -134,6 +173,13 @@ class DashboardService {
                     'icon' => 'pi pi-cart-arrow-down',
                     'value' => $totalBooksLoaned,
                     'color' => 'bg-blue-100'
+                ],
+
+                [
+                    'name' => 'Prestamos por mes',
+                    'icon' => 'pi pi-calendar',
+                    'value' => $totalBooksLoanedMonth,
+                    'color' => 'bg-yellow-300'
                 ],
 
                 [
