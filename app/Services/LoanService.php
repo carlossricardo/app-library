@@ -16,6 +16,40 @@ use Illuminate\Support\Facades\DB;
 class LoanService {
 
 
+
+    public function deleteItem( Request $request ){
+
+        try {
+
+            $loan_id = $request->get('loan_id'); 
+            
+
+
+            $loanItem = Loan::where('id', $loan_id)->first();
+            $loanItem->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Registro eliminado con éxito.',
+                'data' => null
+            ], 200);  
+
+
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+
+    }
+
+
     public function patch( Request $request ){
 
 
@@ -69,11 +103,10 @@ class LoanService {
             $loan->status = $newStatus;
 
             $loan->save();  
-            
-              // Obtén el préstamo actualizado con las relaciones
+                          
             $loan = Loan::with(['details.book', 'user', 'reviewer'])->find($loan->id);
 
-            // Formatea el préstamo en el formato que necesitas
+            
             $formattedLoan = [
                 'id' => $loan->id,
                 'status' => $loan->status,
@@ -97,7 +130,7 @@ class LoanService {
                         'quantity' => $detail->quantity,
                         'book' => $detail->book,
                     ];
-                })->toArray(), // Convierte los detalles a un array si es necesario
+                })->toArray(),
             ];
 
             return response()->json([

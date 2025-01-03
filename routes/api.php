@@ -28,6 +28,8 @@ Route::prefix('dashboard')->middleware('jwt-middleware')->group(function () {
 
     Route::get('/active', [DashboardController::class, 'findAll'])
         ->middleware('profile-middleware:ADMIN');
+    Route::get('/client/active', [DashboardController::class, 'findAllClient'])
+        ->middleware('profile-middleware:STUDENT,ADMIN');
 
 
 });
@@ -42,6 +44,15 @@ Route::prefix('administration')->middleware('jwt-middleware')->group(function ()
         ->middleware('profile-middleware:ADMIN');
     Route::get('/category', [CategoryController::class, 'findAll'])
         ->middleware('profile-middleware:ADMIN');
+    Route::patch('/category', [CategoryController::class, 'patch'])
+        ->middleware('profile-middleware:ADMIN');
+    Route::get('/category/remove', [CategoryController::class, 'deleteItem'])
+        ->middleware('profile-middleware:ADMIN');
+
+
+        
+    Route::get('/client/category', [CategoryCliController::class, 'findAllClient'])
+        ->middleware('profile-middleware:ADMIN');
 
 
     //Books
@@ -49,8 +60,9 @@ Route::prefix('administration')->middleware('jwt-middleware')->group(function ()
         ->middleware('profile-middleware:ADMIN');
     Route::patch('/book', [BookController::class, 'patch'])
         ->middleware('profile-middleware:ADMIN');
-
     Route::get('/book', [BookController::class, 'findAll'])
+        ->middleware('profile-middleware:ADMIN');
+    Route::get('/book/remove', [BookController::class, 'deleteItem'])
         ->middleware('profile-middleware:ADMIN');
 
     //Books clients
@@ -79,10 +91,13 @@ Route::prefix('administration')->middleware('jwt-middleware')->group(function ()
     Route::get('/loan', [LoanController::class, 'findAll'])
         ->middleware('profile-middleware:ADMIN');
     Route::patch('/loan', [LoanController::class, 'patch'])
-    ->middleware('profile-middleware:ADMIN');
-    
+        ->middleware('profile-middleware:ADMIN');    
+    Route::get('/loan/remove', [LoanController::class, 'deleteItem'])
+        ->middleware('profile-middleware:ADMIN');
+
     Route::get('/client/loan', [LoanCliController::class, 'findAllClient'])
         ->middleware('profile-middleware:STUDENT');  
+
 
 
 });

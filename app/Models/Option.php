@@ -16,7 +16,7 @@ class Option extends Model
     protected $keyType = 'string';
     
 
-    protected $fillable = ['name', 'url', 'icon', 'parent_id', 'status'];
+    protected $fillable = ['name', 'url', 'icon', 'parent_id', 'status', 'order'];
 
     protected static function boot()
     {

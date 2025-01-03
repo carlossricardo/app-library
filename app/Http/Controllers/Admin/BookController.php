@@ -33,6 +33,10 @@ class BookController extends Controller {
         return $this->bookService->findAll( $offset, $limit );
     }
 
+    public function deleteItem( Request $request ){
+        return $this->bookService->deleteItem( $request );
+    }
+
 
     
 }

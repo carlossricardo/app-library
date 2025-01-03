@@ -14,7 +14,7 @@ class Category extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['code', 'name', 'description'];
+    protected $fillable = ['code', 'name', 'description', 'status'];
 
     protected static function boot()
     {

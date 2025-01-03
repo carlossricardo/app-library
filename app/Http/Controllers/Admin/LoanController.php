@@ -25,4 +25,8 @@ class LoanController extends Controller
         return $this->loanService->patch( $request );
     }
 
+    public function deleteItem( Request $request ){
+        return $this->loanService->deleteItem( $request );
+    }
+
 }

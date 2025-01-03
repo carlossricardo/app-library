@@ -15,6 +15,39 @@ use Illuminate\Support\Facades\DB;
 class BookService {
 
 
+    public function deleteItem( Request $request ){
+
+        try {
+
+            $book_id = $request->get('book_id'); 
+            
+
+
+            $bookItem = Book::where('id', $book_id)->first();
+            $bookItem->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Registro eliminado con éxito.',
+                'data' => null
+            ], 200);  
+
+
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+
+    }
+
+
     public function findAllByBookUuid ( $categoryUuid, int $offset = 0, int $limit = 10 ) {
 
         try {
@@ -107,7 +140,7 @@ class BookService {
     
             return response()->json([
                 'status' => true,
-                'message' => 'Libro actualizado con éxito.',
+                'message' => 'Registro actualizado con éxito.',
                 'data' => $response,
             ], 200);
             
@@ -158,7 +191,7 @@ class BookService {
             
             return response()->json([
                 'status' => true,
-                'message' => 'Libro creado y categorías asociadas con éxito.',
+                'message' => 'Registro creado con éxito.',
                 'data' => $response,
             ], 201);
 

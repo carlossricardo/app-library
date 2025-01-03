@@ -20,8 +20,21 @@ class CategoryController extends Controller
         return $this->categoryService->create( $newRequest );
     }
 
-    public function findAll (){                      
-        return $this->categoryService->findAll();
+    public function findAll ( Request $request ){                      
+        $limit = $request->get('limit', 10); 
+        $offset = $request->get('offset', 0);
+        return $this->categoryService->findAll( $offset, $limit );        
+
+    }
+
+    public function patch( Request $request ){
+        $newRequest = collect($request)->all();  
+        $category_id = $request->get('category_id');                       
+        return $this->categoryService->patch( $category_id, $newRequest );
+    }
+
+    public function deleteItem( Request $request ){
+        return $this->categoryService->deleteItem( $request );
     }
 
 }

@@ -20,5 +20,9 @@ class DashboardController extends Controller
         return $this->dashboardService->findAll();
     }
 
+    public function findAllClient ( ){                      
+        return $this->dashboardService->findAllClient();
+    }
+
 
 }

@@ -62,13 +62,15 @@ class SecurityService {
             $user_id = Auth::id();
 
             $user = User::find($user_id);
-    
+
             $options = $user->profiles()
-                ->with('options.children')
+                ->with(['options' => function ($query) {
+                    $query->orderBy('order', 'asc');
+                }])
                 ->get()
-                ->pluck('options') 
-                ->flatten() 
-                ->unique('id') 
+                ->pluck('options')
+                ->flatten()
+                ->unique('id')
                 ->map(function ($option) {
                     return [
                         'id' => $option->id,
@@ -79,6 +81,7 @@ class SecurityService {
                         'status' => $option->status,
                     ];
                 });
+    
     
             $menus = $options->whereNull('parent_id') 
                 ->map(function ($menu) use ($options) {

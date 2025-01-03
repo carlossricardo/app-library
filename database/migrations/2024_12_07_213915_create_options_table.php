@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('icon', 70);
             $table->uuid('parent_id')->nullable(); 
             $table->boolean('status')->default(true);
+            $table->integer('order')->nullable();
             $table->timestamps();
 
             

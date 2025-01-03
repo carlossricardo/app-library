@@ -15,6 +15,9 @@ class OptionSeeder extends Seeder
     public function run(): void
     {
         $menus = [
+
+
+            
             [
                 'id' => (string) \Str::uuid(),
                 'name' => 'Inicio',
@@ -22,11 +25,9 @@ class OptionSeeder extends Seeder
                 'icon' => 'pi pi-home',
                 'parent_id' => null,
                 'status' => true,
-                'profiles' => ['ADMIN', 'STUDENT']
+                'profiles' => ['ADMIN', 'STUDENT'],
+                'order' => 0,
             ],
-
-
-            
             [
                 'id' => (string) \Str::uuid(),
                 'name' => 'Administración',
@@ -34,7 +35,8 @@ class OptionSeeder extends Seeder
                 'icon' => 'pi pi-database',
                 'parent_id' => null,
                 'status' => true,
-                'profiles' => ['ADMIN']
+                'profiles' => ['ADMIN'],
+                'order' => 1,
             ],
             [
                 'id' => (string) \Str::uuid(),
@@ -43,7 +45,8 @@ class OptionSeeder extends Seeder
                 'icon' => 'pi pi-database',
                 'parent_id' => null,
                 'status' => true,
-                'profiles' => ['ADMIN', 'STUDENT']
+                'profiles' => ['ADMIN', 'STUDENT'],
+                'order' => 2,
             ],
             [
                 'id' => (string) \Str::uuid(),
@@ -52,7 +55,8 @@ class OptionSeeder extends Seeder
                 'icon' => 'pi pi-cog',
                 'parent_id' => null,
                 'status' => true,
-                'profiles' => ['ADMIN', 'STUDENT']
+                'profiles' => ['ADMIN', 'STUDENT'],
+                'order' => 3,
             ],
         ];
 
@@ -65,10 +69,19 @@ class OptionSeeder extends Seeder
             
             [
                 'id' => (string) \Str::uuid(),
+                'name' => 'Dashboard',
+                'url' => '/',
+                'icon' => 'pi pi-objects-column',
+                'parent_id' => $menus[0]['id'],
+                'status' => true,
+                'profiles' => ['ADMIN', 'STUDENT']
+            ],
+            [
+                'id' => (string) \Str::uuid(),
                 'name' => 'Gestión de libros',
                 'url' => '/books',
                 'icon' => 'pi pi-book',
-                'parent_id' => $menus[0]['id'],
+                'parent_id' => $menus[1]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
@@ -77,7 +90,7 @@ class OptionSeeder extends Seeder
                 'name' => 'Gestión de categorías',
                 'url' => '/categories',
                 'icon' => 'pi pi-objects-column',
-                'parent_id' => $menus[0]['id'],
+                'parent_id' => $menus[1]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
@@ -86,17 +99,20 @@ class OptionSeeder extends Seeder
                 'name' => 'Gestión de prestamos',
                 'url' => '/loans',
                 'icon' => 'pi pi-book',
-                'parent_id' => $menus[0]['id'],
+                'parent_id' => $menus[1]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
+
+
+
             
             [
                 'id' => (string) \Str::uuid(),
                 'name' => 'Libros disponibles',
                 'url' => '/books/client',
                 'icon' => 'pi pi-book',
-                'parent_id' => $menus[1]['id'],
+                'parent_id' => $menus[2]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
@@ -105,34 +121,38 @@ class OptionSeeder extends Seeder
                 'name' => 'Categorías',
                 'url' => '/categories/client',
                 'icon' => 'pi pi-objects-column',
-                'parent_id' => $menus[1]['id'],
+                'parent_id' => $menus[2]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
             [
                 'id' => (string) \Str::uuid(),
-                'name' => 'Gestión de prestamos',
+                'name' => 'Mis prestamos',
                 'url' => '/loans/client',
                 'icon' => 'pi pi-shopping-cart',
-                'parent_id' => $menus[1]['id'],
+                'parent_id' => $menus[2]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
+
+
             [
                 'id' => (string) \Str::uuid(),
-                'name' => 'Prestamos',
+                'name' => 'Otros',
                 'url' => '/',
-                'icon' => 'pi pi-receipt',
-                'parent_id' => $menus[1]['id'],
+                'icon' => 'pi pi-eject',
+                'parent_id' => $menus[2]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
+
+
             [
                 'id' => (string) \Str::uuid(),
                 'name' => 'Gestión de perfil',
                 'url' => '/',
-                'icon' => 'pi pi-database',
-                'parent_id' => $menus[2]['id'],
+                'icon' => 'pi pi-user-edit',
+                'parent_id' => $menus[3]['id'],
                 'status' => true,
                 'profiles' => ['ADMIN', 'STUDENT']
             ],
@@ -148,6 +168,7 @@ class OptionSeeder extends Seeder
                 'icon' => $menu['icon'],
                 'parent_id' => $menu['parent_id'],
                 'status' => $menu['status'],
+                'order' => $menu['order'],
             ]);
 
             

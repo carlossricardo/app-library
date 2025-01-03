@@ -9,6 +9,7 @@ use App\Exceptions\NotFoundException;
 use App\Exceptions\InternalServerErrorException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardService {
 
@@ -98,6 +99,75 @@ class DashboardService {
             throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
         }
                 
+    }
+
+
+
+    public function findAllClient(){
+
+        try {
+            $userId = Auth::id();
+
+            $startOfWeek = Carbon::now()->startOfWeek(); 
+            $endOfWeek = Carbon::now()->endOfWeek();
+
+            
+            $loans = Loan::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                        ->where('user_id', $userId)
+                        ->with('details') 
+                        ->get();
+
+             
+            $totalBooksLoaned = 0;
+
+            foreach ($loans as $loan) {
+                foreach ($loan->details as $detail) {
+                    $totalBooksLoaned += $detail->quantity; 
+                }
+            }
+
+            $totalAvailableBooks = Book::where('status', true)->count();
+
+            $dashboard = [
+                [
+                    'name' => 'Prestamos por semana',
+                    'icon' => 'pi pi-cart-arrow-down',
+                    'value' => $totalBooksLoaned,
+                    'color' => 'bg-blue-100'
+                ],
+
+                [
+                    'name' => 'Libros disponibles',
+                    'icon' => 'pi pi-book',
+                    'value' => $totalAvailableBooks,
+                    'color' => 'bg-cyan-100'
+                ],
+
+         
+            ];
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data successful',
+                'data' => $dashboard,
+               
+            ], 200);
+
+
+        }   catch (QueryException $e) {                         
+            if ($e->getCode() === '2002' || strpos($e->getMessage(), 'No connection') !== false) {
+                throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $e->getMessage());
+            }            
+            throw new InternalServerErrorException('Error al guardar en la base de datos: ' . $e->getMessage());
+    
+        }   catch (\PDOException $th) {            
+            throw new InternalServerErrorException('Error de conexión en la base de datos: ' . $th->getMessage());
+            
+        }   catch (Exception $e) {            
+            throw new InternalServerErrorException('Error no controlado: ' . $e->getMessage());
+        }
+
     }
 
     
